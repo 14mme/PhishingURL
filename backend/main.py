@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import joblib
 
-from .feature_extraction import extract_features
+from feature_extraction import extract_features
 
 # Load model
 BASE_DIR = Path(__file__).resolve().parent
