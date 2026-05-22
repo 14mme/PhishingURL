@@ -1,6 +1,21 @@
 import re
+import pandas as pd
 
 from urllib.parse import urlparse
+
+FEATURE_COLUMNS = [
+    'url_length',
+    'domain_length',
+    'path_length',
+    'subdomain_count',
+    'dot_count',
+    'slash_count',
+    'dash_count',
+    'special_char_count',
+    'digit_count',
+    'at_count',
+    'has_ip'
+]
 
 def extract_features(url):
 
@@ -57,7 +72,7 @@ def extract_features(url):
         parsed.netloc
     ) else 0
 
-    return {
+    features = {
         'url_length': url_length,
         'domain_length': domain_length,
         'path_length': path_length,
@@ -70,3 +85,10 @@ def extract_features(url):
         'at_count': at_count,
         'has_ip': has_ip
     }
+
+    # DataFrame dengan urutan tetap
+    features_df = pd.DataFrame(
+        [features]
+    )[FEATURE_COLUMNS]
+
+    return features_df

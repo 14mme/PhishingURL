@@ -1,19 +1,20 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from pathlib import Path
 import pandas as pd
 import joblib
 
-from feature_extraction import extract_features
+from .feature_extraction import extract_features
 
 # Load model
-model = joblib.load(
-    'model/Baseline_Model_v2.pkl'
-)
+BASE_DIR = Path(__file__).resolve().parent
+model_path = BASE_DIR / "model" / "Baseline_Model_v2.pkl"
+model = joblib.load(model_path)
 
 # FastAPI App
 app = FastAPI(
-    title='Phishing URL Detection API'
+    title='URL Detection API'
 )
 
 # Request Body
@@ -24,7 +25,7 @@ class URLRequest(BaseModel):
 @app.get('/')
 def home():
     return {
-        'message': 'Phishing URL Detection API Running'
+        'message': 'URL Detection API Running'
     }
 
 # Prediction Endpoint
@@ -32,23 +33,19 @@ def home():
 def predict(data: URLRequest):
 
     # Extract Features
-    features = extract_features(data.url)
-
-    features_df = pd.DataFrame([features])
+    features_df = extract_features(data.url)
 
     # Prediction
     prediction = model.predict(features_df)[0]
 
     # Probability
-    probability = model.predict_proba(
-        features_df
-    )[0].max()
+    probability = model.predict_proba(features_df)[0].max()
 
     # Result Label
     result = (
-        'Phishing'
+        'Risk'
         if prediction == 1
-        else 'Legitimate'
+        else 'Safe'
     )
 
     return {
